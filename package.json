@@ -1,11 +1,13 @@
 {
     "name": "sanity-plugin-html-to-portable-text",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Sanity custom input plugin to convert HTML to Portable Text",
     "main": "dist/index.js",
     "scripts": {
-        "build": "babel src --out-dir dist",
-        "prepublishOnly": "npm run build"
+        "build": "babel src --out-dir dist --extensions '.js,.jsx,.ts,.tsx'",
+        "prepublishOnly": "npm run build",
+        "watch": "babel --watch src ---out-dir lib --extensions '.ts,.tsx'",
+        "tsc": "tsc"
     },
     "repository": {
         "type": "git",
@@ -35,6 +37,7 @@
         "@babel/core": "^7.14.3",
         "@babel/plugin-transform-runtime": "^7.14.3",
         "@babel/preset-env": "^7.14.2",
-        "@babel/preset-react": "^7.13.13"
+        "@babel/preset-react": "^7.13.13",
+        "@babel/preset-typescript": "^7.13.0"
     }
 }
