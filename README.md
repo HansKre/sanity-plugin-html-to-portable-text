@@ -1,7 +1,7 @@
 
 # Sanity Plugin `HTML to Portable Text`
 
-This plugin provides a custom input component which converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly. Here is a gread [Introduction to Portable Text](https://www.sanity.io/guides/introduction-to-portable-text).
+This plugin provides a custom input component which converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly.
 
 `Sanity` is using the `Portable Text`-format whenever you use the `block`-type along with the [`WYSIWYG`-Block Content Editor](https://www.sanity.io/docs/customization).
 
@@ -136,6 +136,10 @@ fields: [
   }
 ]
 ```
+
+## Further reading
+
+- [Introduction to Portable Text](https://www.sanity.io/guides/introduction-to-portable-text).
 
 ## Features
 
