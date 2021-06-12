@@ -9,7 +9,7 @@ Since `HTML to Portable Text` does a on-the-fly-conversion, it does not mirror n
 
 You may want to link`HTML to Portable Text` with a `block`-field to persist the corresponding `Portable Text`] to your `schema`.
 
-![Demo](documentation-assets/demo-7fps.gif)
+![Demo](docs/demo-7fps.gif)
 
 ## Installation
 
