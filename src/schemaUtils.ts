@@ -6,7 +6,7 @@ const BLOCK_FIELD = 'blockField'
 export type SchemaType = {
     title: string,
     options: {
-        refblock: string,
+        refblockdefault: string,
         styles?: Array<object>,
         lists?: Array<object>,
         marks?: object,
