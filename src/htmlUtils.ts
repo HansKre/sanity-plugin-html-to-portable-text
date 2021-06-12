@@ -2,12 +2,9 @@ import DOMPurify from 'dompurify'
 import blockTools from '@sanity/block-tools'
 
 export const validationsPass = (html: string): boolean => {
-    // if opening < exists, must end on >
-    const mustEndOnClosingBracketIfOpeningBracketExists = (html.match(/</g) || []).length === 0 || html.endsWith('>')
     // must have same number of opening and closing brackets
     const numberOpeningMatchesClosing = (html.match(/</g) || []).length === (html.match(/>/g) || []).length
-    console.log(mustEndOnClosingBracketIfOpeningBracketExists, numberOpeningMatchesClosing, (html.match(/</g) || []).length, (html.match(/>/g) || []).length)
-    return mustEndOnClosingBracketIfOpeningBracketExists && numberOpeningMatchesClosing
+    return numberOpeningMatchesClosing
 }
 
 export const isValidHTML = (html: string): boolean => {
