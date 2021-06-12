@@ -6,7 +6,7 @@
     "scripts": {
         "build": "babel src --out-dir dist --extensions '.js,.jsx,.ts,.tsx'",
         "prepublishOnly": "npm run build",
-        "watch": "babel --watch src ---out-dir lib --extensions '.ts,.tsx'",
+        "watch": "babel --watch src --out-dir dist --extensions '.ts,.tsx'",
         "tsc": "tsc"
     },
     "repository": {
