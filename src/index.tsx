@@ -1,13 +1,12 @@
-import React from 'react'
+import React, {forwardRef, useMemo, useCallback, useEffect, useState, Ref, FocusEventHandler, BaseSyntheticEvent} from 'react'
 import {FormField} from '@sanity/base/components'
-import {TextInput, Card, Stack, Select} from '@sanity/ui'
+import {TextInput, Card, Stack, Select, Text, Label} from '@sanity/ui'
 import {withDocument} from 'part:@sanity/form-builder'
 import {useDocumentOperation} from '@sanity/react-hooks'
 import {uuid} from '@sanity/uuid'
 import blocksToHtml from '@sanity/block-content-to-html'
 import {convertToBlock} from './htmlUtils'
-import {compileBlockContentType, SchemaType} from './schemaUtils'
-import schema from 'part:@sanity/base/schema'
+import {compileBlockContentType, getBlockTypes, getBlockTypeByName, dummyBlockType, SchemaType, TypeType} from './schemaUtils'
 
 export type Props = {
     type: SchemaType,
@@ -15,12 +14,12 @@ export type Props = {
     markers?: any,
     presence?: any,
     compareValue?: any,
-    onFocus: (id: string) => void,
-    onBlur: (id: string) => void,
+    onFocus: FocusEventHandler<HTMLInputElement>,
+    onBlur: FocusEventHandler<HTMLInputElement>,
     document: any
 }
 
-const HtmlToPortableTextInput = React.forwardRef((props: Props, ref: React.ReactElement) => {
+const HtmlToPortableTextInput = forwardRef((props: Props, ref: Ref<HTMLInputElement> | undefined) => {
     const {
         type,                       // Schema information
         readOnly,                   // Boolean if field is not editable
@@ -32,20 +31,30 @@ const HtmlToPortableTextInput = React.forwardRef((props: Props, ref: React.React
         document: sanityDocument    // The surrounding document
     } = props
 
-    const inputId = uuid()
+    let sanityBlockTypes: TypeType[] = useMemo(() => getBlockTypes(sanityDocument), [sanityDocument])
+    const inputId: string = useMemo(() => uuid(), [])
 
-    const [blockContentType, setBlockContentType] = React.useState()
-    const [htmlInputValue, setHtmlInputValue] = React.useState('')
+    const [htmlInputValue, setHtmlInputValue] = useState('')
 
-    React.useEffect(() => {
-        const blockContentType = compileBlockContentType(type)
+    const initialySelectedBlock: TypeType | undefined = type?.options?.refblockdefault ? getBlockTypeByName(sanityBlockTypes, type?.options?.refblockdefault) : sanityBlockTypes[0]
+    console.log('initiallyselected', initialySelectedBlock)
+
+    const [selectedBlockType, setSelectedBlockType] = useState<TypeType | undefined>(initialySelectedBlock)
+
+    const [blockContentType, setBlockContentType] = useState()
+
+    useEffect(() => {serializeReferencedBlockToHtml()}, [selectedBlockType])
+    useEffect(() => {
+        const blockContentType = compileBlockContentType(selectedBlockType || dummyBlockType)
         setBlockContentType(blockContentType)
-    }, [type])
+    }, [selectedBlockType])
+
+    const {patch: documentPatch} = useDocumentOperation(sanityDocument?._id?.replace('drafts.', '') || '0', sanityDocument?._type) as {patch: any}
 
     const serializeReferencedBlockToHtml = () => {
-        if (selectedBlock && sanityDocument.hasOwnProperty('_id') && sanityDocument.hasOwnProperty(selectedBlock)) {
+        if (selectedBlockType && sanityDocument.hasOwnProperty('_id') && sanityDocument.hasOwnProperty(selectedBlockType.name)) {
             setHtmlInputValue(blocksToHtml({
-                blocks: sanityDocument[selectedBlock],
+                blocks: sanityDocument[selectedBlockType.name],
             }))
             return htmlInputValue
         } else {
@@ -53,48 +62,26 @@ const HtmlToPortableTextInput = React.forwardRef((props: Props, ref: React.React
         }
     }
 
-    React.useEffect(() => {serializeReferencedBlockToHtml()}, [serializeReferencedBlockToHtml])
-
-    const {patch: documentPatch} = useDocumentOperation(sanityDocument?._id?.replace('drafts.', '') || '0', sanityDocument?._type) as {patch: any}
-
-    interface TypeType {
-        name: string;
-        type: string;
-        title?: string;
-        of?: [];
-    }
-
-    const getBlockTypes = (): Array<TypeType> => {
-        const types = schema._source.types
-        const sanityDocSchema = types
-            .filter((t: TypeType) => t.name === sanityDocument._type)[0]
-        const sanityBlockTypes = sanityDocSchema.fields.filter((t: TypeType) => t.type === 'array' && t?.of?.find((elem: {type: string}) => elem.type === 'block'))
-        console.log(sanityBlockTypes)
-        return sanityBlockTypes
-    }
-    let sanityBlockTypes: Array<TypeType> = React.useMemo(getBlockTypes, [sanityDocument])
-
-    const [selectedBlock, setSelectedBlock] = React.useState(type?.options?.refblockdefault || (sanityBlockTypes && sanityBlockTypes[0]))
-    const [selectValue, setSelectValue] = React.useState()
-    const handleSelectChange = (event: React.SyntheticEvent) => {
+    const handleSelectChange = (event: BaseSyntheticEvent) => {
         const newSelectedBlockName = event.target.value.split(': ')[1]
-        setSelectedBlock(newSelectedBlockName)
-        setSelectValue(event.target.value)
+        setSelectedBlockType(getBlockTypeByName(sanityBlockTypes, newSelectedBlockName))
     }
 
-    const handleHtmlChange = React.useCallback(
-        (event: React.Event) => {
-            const inputValue = event.currentTarget.value
-            setHtmlInputValue(inputValue)
-            convertAndSavelySetReferencedBlock(type, documentPatch, blockContentType, inputValue, selectedBlock)
-        },
-        [blockContentType, documentPatch, type, selectedBlock, selectValue]
-    )
+    const handleHtmlChange = useCallback((event: BaseSyntheticEvent): void => {
+        const inputValue = event.currentTarget.value
+        setHtmlInputValue(inputValue)
+        if (selectedBlockType) convertAndSavelySetReferencedBlock(type, documentPatch, blockContentType, inputValue, selectedBlockType.name)
+    }, [blockContentType, documentPatch, type, selectedBlockType])
+
+    const FONT_SIZE = 2
+    const PLACE_HOLDER = 'HTML-Input e.g. <h1>Hello World</h1>'
+    const selectedValueFromBlockType = (blockType: TypeType | undefined): string => {
+        return blockType ? `${blockType.title}: ${blockType.name}` : ''
+    }
 
     return (
         <FormField
             title={type.title}
-            description='Your Html goes here'
             // Handles all markers including validation
             __unstable_markers={markers}
             // Handles presence avatars
@@ -107,34 +94,44 @@ const HtmlToPortableTextInput = React.forwardRef((props: Props, ref: React.React
             {sanityDocument.hasOwnProperty('_id') ?
                 <>
                     <Card padding={0}>
-                        <Stack>
-                            <Select
-                                fontSize={[2, 2, 3, 4]}
-                                padding={[3, 3, 4]}
-                                space={[3, 3, 4]}
-                                onChange={handleSelectChange}
-                                disabled={sanityBlockTypes.length < 2}
-                                value={selectValue}
-                            >
-                                {sanityBlockTypes?.map(blocktype => (
-                                    <option key={uuid()} >{
-                                        `${blocktype.title}: ${blocktype.name}`}
-                                    </option>
-                                ))}
-                            </Select>
+                        <Stack space={3}>
+                            <Card marginTop={1} marginBottom={2}>
+                                <Stack space={3}>
+                                    <Text size={FONT_SIZE}>Block-Field</Text>
+                                    <Select
+                                        fontSize={FONT_SIZE}
+                                        padding={3}
+                                        space={3}
+                                        onChange={handleSelectChange}
+                                        disabled={sanityBlockTypes.length < 2}
+                                        value={selectedValueFromBlockType(selectedBlockType)}
+                                    >
+                                        {sanityBlockTypes?.map(blockType => (
+                                            <option key={uuid()} >{selectedValueFromBlockType(blockType)}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </Stack>
+                            </Card>
+                            <Card marginTop={1} marginBottom={2}>
+                                <Stack space={3}>
+                                    <Text size={FONT_SIZE}>HTML-Input</Text>
+                                    <TextInput
+                                        id={inputId}
+                                        fontSize={FONT_SIZE}
+                                        value={htmlInputValue}
+                                        readOnly={readOnly}
+                                        placeholder={PLACE_HOLDER}
+                                        onFocus={onFocus}
+                                        onBlur={onBlur}
+                                        onChange={handleHtmlChange}
+                                        ref={ref}
+                                    />
+                                </Stack>
+                            </Card>
                         </Stack>
-                        <TextInput
-                            id={inputId}
-                            value={htmlInputValue}
-                            readOnly={readOnly}
-                            placeholder='<h1>Hello World</h1>'
-                            onFocus={onFocus}
-                            onBlur={onBlur}
-                            onChange={handleHtmlChange}
-                            ref={ref}
-                        />
                     </Card>
-                    {!selectedBlock ?
+                    {!selectedBlockType ?
                         <p><i>Schema does not seem to specify a <b>block</b>-type. Please specify a valid <b>block</b>-type to see the output.</i></p>
                         : ''
                     }
@@ -146,11 +143,11 @@ const HtmlToPortableTextInput = React.forwardRef((props: Props, ref: React.React
 
 export default withDocument(HtmlToPortableTextInput)
 
-function convertAndSavelySetReferencedBlock(type: SchemaType, documentPatch: any, blockContentType: any, html: string, selectedBlock: string): void {
-    if (selectedBlock && documentPatch && blockContentType) {
+function convertAndSavelySetReferencedBlock(type: SchemaType, documentPatch: any, blockContentType: any, html: string, selectedBlockType: string): void {
+    if (selectedBlockType && documentPatch && blockContentType) {
         const blocks = convertToBlock(blockContentType, html)
         // unset invalid html. This is necessary since the block-component sanitizes invalid html and hence overwrites invalid input field values. This leads to bad user experience
-        blocks ? setBlock(blocks, documentPatch, selectedBlock) : unsetBlock(documentPatch, selectedBlock)
+        blocks ? setBlock(blocks, documentPatch, selectedBlockType) : unsetBlock(documentPatch, selectedBlockType)
     }
 }
 

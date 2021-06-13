@@ -1,13 +1,13 @@
 
 # Sanity Plugin `HTML to Portable Text`
 
-This plugin provides a custom input component which converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly.
+This plugin is a custom input component which converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly.
 
-`Sanity` is using the `Portable Text`-format whenever you use the `block`-type along with the [`WYSIWYG`-Block Content Editor](https://www.sanity.io/docs/customization).
+`Sanity` is using the `Portable Text`-format whenever you use the `block`-type.
 
-Since `HTML to Portable Text` does a on-the-fly-conversion, it does not mirror nor persist the `HTML` to your schema. This is a deliberate design decision, for one, to avoid redundancy, secondly, to avoid inconsistant data, and thirdly, it would defeat the whole purpose of the `Portable Text`.
+In `Sanity-Studio` there is a [`WYSIWYG`-Block Content Editor](https://www.sanity.io/docs/customization) which makes editing very convenient. But if you are just migrating to `sanity` and your source is `HTML`, this plugin may come in handy.
 
-You may want to link`HTML to Portable Text` with a `block`-field to persist the corresponding `Portable Text`] to your `schema`.
+Your `schema` needs to define at least one `block`-type field to allow persisting to your `schema`.
 
 ![Demo](docs/demo-7fps.gif)
 
@@ -19,9 +19,40 @@ Install the Sanity Plugin `HTML to Portable Text` with the [`sanity CLI`](https:
   sanity install sanity-plugin-html-to-portable-text
 ```
 
-## Usage/Examples
+## Usage
 
-To make it available, just add a field of `htmlPortableText`-type to your fields-array and reference another field of `block`-type.
+Just add a field of `htmlPortableText`-type to your fields-array.
+
+### Basic Usage
+
+```js
+fields: [
+  {
+    name: 'htmlToArticleBody',
+    title: 'HTML to Article Body',
+    type: 'htmlToProtableText',
+  {
+    name: 'articleBody',
+    title: 'Article Body',
+    type: 'array',
+    of: [ { type: 'block' } ]
+  }
+]
+```
+
+### Example with pre-selected block
+
+If you have multiple `block`-type fields, you may want to have one selected as the default.
+
+### Parameters
+
+```js
+  options: { defaultrefblock: '<name>' },
+```
+
+| Parameter         | Type     | Description                            | Default                                      |
+| :---------------- | :------- | :------------------------------------- | :------------------------------------------- |
+| `defaultrefblock` | `string` | **Optional**. Name of referenced block | First `block`-type as defined in your schema |
 
 ```js
 fields: [
@@ -34,37 +65,11 @@ fields: [
     name: 'articleBody',
     title: 'Article Body',
     type: 'array',
-    of: [ { type: 'block' } ]
-  }
-]
-```
-
-You can configure `styles`, `markers`, `lists`, `decorators`, etc. as you are used to. Only make sure to have it in sync for the `htmlToProtableText`-type as well as the `block`-type.
-
-```js
-fields: [
-  {
-    name: 'htmlToArticleBody',
-    title: 'HTML to Article Body',
-    type: 'htmlToProtableText',
-    options: {
-      refblock: 'articleBody',
-      styles: [
-        // allow only unstyled, H1 and H2
-        { title: 'Unstyled', value: 'normal' },
-        { title: 'H1', value: 'h1' },
-        { title: 'H2', value: 'h2' },
-      ]
-  },
-  {
-    name: 'articleBody',
-    title: 'Article Body',
-    type: 'array',
     of: [
       {
         type: 'block',
         styles: [
-          // make sure to sync the same definitions here
+          // we only want couple of styles to be available
           { title: 'Unstyled', value: 'normal' },
           { title: 'H1', value: 'h1' },
           { title: 'H2', value: 'h2' },
@@ -75,12 +80,9 @@ fields: [
 ]
 ```
 
-### Caveats
-
-- Make sure to have `refblock` reference a **valid** block. Otherwise, sanity will complain about `invalid field`.
-- Make sure to set `styles` in options according to `styles` of the refernced block, otherwise conversion back and forth will bear different results.
-
 ### Advanced Example
+
+This example show how you may radically limit the available styles in `Portable Text`.
 
 ```js
 fields: [
@@ -88,25 +90,6 @@ fields: [
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
     type: 'htmlToProtableText',
-    options: {
-      refblock: 'articleBody',
-      // Disallow styles
-      styles: [],
-      // Disallow lists
-      lists: [],
-      marks: {
-        // Only allow these decorators
-        decorators: [
-            { title: 'Bold', value: 'strong' },
-            {
-                title: 'Superscript',
-                value: 'sup',
-                // blockEditor not needed here
-            },
-        ],
-        // disallow links
-        annotations: []
-      }
   },
   {
     name: 'articleBody',
@@ -115,21 +98,25 @@ fields: [
     of: [
       {
         type: 'block',
+        // Disallow all styles
         styles: [],
+          // Disallow all lists
         lists: [],
         marks: {
+          // Only allow these decorators
           decorators: [
-              { title: 'Bold', value: 'strong' },
+            { title: 'Bold', value: 'strong' },
               {
-                  title: 'Superscript',
+                title: 'Superscript',
                   value: 'sup',
                   // Define custom icon and renderer for the blockEditor
                   blockEditor: {
-                      icon: () => <div>⤴</div>,
+                    icon: () => <div>⤴</div>,
                       render: ({ children }) => <span><sup>{children}</sup></span>
                   }
               },
           ],
+          // disallow links
           annotations: []
       }
     ]
@@ -139,19 +126,16 @@ fields: [
 
 ## Further reading
 
-- [Introduction to Portable Text](https://www.sanity.io/guides/introduction-to-portable-text).
+- [Introduction to Portable Text](https://www.sanity.io/guides/introduction-to-portable-text)
+- [Using Portable Text in React](https://github.com/sanity-io/block-content-to-react)
 
 ## Features
 
 - provides a custom input component
 - converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly
-- if linked to a `block`-field, persist the corresponding [Portable Text](https://github.com/portabletext/portabletext) to your `schema`
+- introspects the `schema` of the parent document and finds all `block`-type fields
+- persist converted `HTML` to selected `block`-type field of your `schema`
 
 ## Roadmap
 
 - Add `unit tests`, since this is a delicate functionality
-- Investigate, if we can introspect the underlying schema so that passing `styles` in options gets obsolete
-  - Inspirations to look into:
-    - [Content Model Graph](https://www.sanity.io/plugins/content-model-graph)
-    - [Schema Inspector](https://www.sanity.io/plugins/schema-inspector)
-- If schema-introspection is possible, check if `refblock` references an existing `block`-type field
