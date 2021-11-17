@@ -30,7 +30,7 @@ fields: [
   {
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
-    type: 'htmlToProtableText',
+    type: 'htmlToPortableText',
   {
     name: 'articleBody',
     title: 'Article Body',
