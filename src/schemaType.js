@@ -2,7 +2,7 @@ import HtmlToPortableTextInput from "./index";
 
 export default {
     title: "HTML to Portable Text",
-    name: "htmlToProtableText",
+    name: "htmlToPortableText",
     type: "object",
     fields: [
         {
