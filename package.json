@@ -1,6 +1,6 @@
 {
     "name": "sanity-plugin-html-to-portable-text",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Sanity custom input plugin to convert HTML to Portable Text",
     "main": "dist/index.js",
     "scripts": {
