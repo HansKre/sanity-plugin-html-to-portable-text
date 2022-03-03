@@ -30,7 +30,7 @@ fields: [
   {
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
-    type: 'htmlToProtableText',
+    type: 'htmlToPortableText',
   {
     name: 'articleBody',
     title: 'Article Body',
@@ -59,7 +59,7 @@ fields: [
   {
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
-    type: 'htmlToProtableText',
+    type: 'htmlToPortableText',
     options: { refblock: 'articleBody' },
   {
     name: 'articleBody',
@@ -89,7 +89,7 @@ fields: [
   {
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
-    type: 'htmlToProtableText',
+    type: 'htmlToPortableText',
   },
   {
     name: 'articleBody',
