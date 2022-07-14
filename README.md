@@ -60,7 +60,9 @@ fields: [
     name: 'htmlToArticleBody',
     title: 'HTML to Article Body',
     type: 'htmlToPortableText',
-    options: { refblock: 'articleBody' },
+    // no need to reference the block
+    // all block-types get picked up automatically
+    // but you can specify which one is pre-selected
   {
     name: 'articleBody',
     title: 'Article Body',
@@ -69,7 +71,7 @@ fields: [
       {
         type: 'block',
         styles: [
-          // we only want couple of styles to be available
+          // enable only below styles
           { title: 'Unstyled', value: 'normal' },
           { title: 'H1', value: 'h1' },
           { title: 'H2', value: 'h2' },
@@ -135,7 +137,3 @@ fields: [
 - converts `HTML` into [Portable Text](https://github.com/portabletext/portabletext) on the fly
 - introspects the `schema` of the parent document and finds all `block`-type fields
 - persist converted `HTML` to selected `block`-type field of your `schema`
-
-## Roadmap
-
-- Add `unit tests`, since this is a delicate functionality
