@@ -45,8 +45,8 @@ const HtmlToPortableTextInput = forwardRef((props: Props, ref: Ref<HTMLInputElem
 
     useEffect(() => {serializeReferencedBlockToHtml()}, [selectedBlockType])
     useEffect(() => {
-        const blockContentType = compileBlockContentType(selectedBlockType || dummyBlockType)
-        setBlockContentType(blockContentType)
+        const _blockContentType = compileBlockContentType(selectedBlockType || dummyBlockType)
+        setBlockContentType(_blockContentType)
     }, [selectedBlockType])
 
     const {patch: documentPatch} = useDocumentOperation(sanityDocument?._id?.replace('drafts.', '') || '0', sanityDocument?._type) as {patch: any}

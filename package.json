@@ -1,43 +1,43 @@
 {
-    "name": "sanity-plugin-html-to-portable-text",
-    "version": "0.0.6",
-    "description": "Sanity custom input plugin to convert HTML to Portable Text",
-    "main": "dist/index.js",
-    "scripts": {
-        "build": "babel src --out-dir dist --extensions '.js,.jsx,.ts,.tsx'",
-        "prepublishOnly": "npm run build",
-        "watch": "babel --watch src --out-dir dist --extensions '.ts,.tsx'",
-        "tsc": "tsc"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/HansKre/sanity-plugin-html-to-portable-text"
-    },
-    "keywords": [
-        "sanity",
-        "plugin",
-        "custom input",
-        "portable text",
-        "sanity field"
-    ],
-    "author": "Hans Krebs",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/HansKre/sanity-plugin-html-to-portable-text/issues"
-    },
-    "homepage": "https://github.com/HansKre/sanity-plugin-html-to-portable-text#readme",
-    "dependencies": {
-        "@sanity/block-content-to-html": "^2.0.0",
-        "@sanity/block-tools": "^2.10.0",
-        "@sanity/uuid": "^3.0.1",
-        "dompurify": "^2.2.9"
-    },
-    "devDependencies": {
-        "@babel/cli": "^7.14.3",
-        "@babel/core": "^7.14.3",
-        "@babel/plugin-transform-runtime": "^7.14.3",
-        "@babel/preset-env": "^7.14.2",
-        "@babel/preset-react": "^7.13.13",
-        "@babel/preset-typescript": "^7.13.0"
-    }
+  "name": "sanity-plugin-html-to-portable-text",
+  "version": "0.0.7",
+  "description": "Sanity custom input plugin to convert HTML to Portable Text",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "babel src --out-dir dist --extensions '.js,.jsx,.ts,.tsx'",
+    "prepublishOnly": "npm run build",
+    "watch": "babel --watch src --out-dir dist --extensions '.ts,.tsx'",
+    "tsc": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HansKre/sanity-plugin-html-to-portable-text"
+  },
+  "keywords": [
+    "sanity",
+    "plugin",
+    "custom input",
+    "portable text",
+    "sanity field"
+  ],
+  "author": "Hans Krebs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HansKre/sanity-plugin-html-to-portable-text/issues"
+  },
+  "homepage": "https://github.com/HansKre/sanity-plugin-html-to-portable-text#readme",
+  "dependencies": {
+    "@sanity/block-content-to-html": "^2.0.0",
+    "@sanity/block-tools": "^2.10.0",
+    "@sanity/uuid": "^3.0.1",
+    "dompurify": "^2.2.9"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0"
+  }
 }
